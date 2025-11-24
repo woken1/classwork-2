@@ -4,7 +4,7 @@ struct Planar
 {
   virtual int x() const = 0;
   virtual int y()const = 0;
-  virtual int abc_sqt() const = 0;
+  virtual int abc_sqr() const = 0;
   virtual ~Planar() = default;
 };
 
@@ -14,8 +14,17 @@ void draw(Planar * pl);
 void free_planars(Planar ** pls, size_t k);
 Planar * most_left (Planar ** pls, size_t k);
 
+struct Point: Planar{
+  virtual int x() const;
+  virtual int y() const;
+  virtual int abc_sqr() const;
+  Point(int xx, int yy);
+  virtual ~Point() = default;
+  private:
+  int data[2];
+};
 
-int mai()
+int main()
 {
   Planar * pls[10] = {};
   size_t k = 0;
@@ -37,7 +46,37 @@ free_planars(pls, k);
   //free_planars(pls,k); 
 }
 
-Planar * makee(size_t pl)
+Point::Point(int xx, int yy):
+  Planar(),
+  data{xx, yy}
+  {}
+
+  int Point::x() const {
+    return data[0];
+  }
+  int Point::y() const{
+    return data[1];
+  }
+  int Point::abc_sqr() const {
+    return x() * x() + y() * y();
+  }
+
+Planar * make (size_t id)
+{
+  Planar * r = nullptr;
+  switch(id)
+  {
+    case 0:
+      r = new Point(0, 0);
+
+    default:
+    throw std::logic_error("bad id");
+  }
+
+  return r;
+}
+
+Planar * make(size_t pl)
 {
   switch(pl)
   {
@@ -65,3 +104,8 @@ Planar * most_left (Planar ** pls, size_t k)
 {
   return nullptr;
 }
+
+
+// Сделать вектор структуру
+// НУЖНО НАПИСАТЬ ДО СРЕДЫ
+// Разбить на ед. тр.
