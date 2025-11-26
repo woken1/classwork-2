@@ -1,111 +1,81 @@
 #include <iostream>
+#include <stdexcept>
+#include "planar.hpp"
+#include "point.hpp"
+#include "vector.hpp"
 
-struct Planar
-{
-  virtual int x() const = 0;
-  virtual int y()const = 0;
-  virtual int abc_sqr() const = 0;
-  virtual ~Planar() = default;
-};
-
-Planar * make(std::istream & is);
-Planar * make(size_t pl);
-void draw(Planar * pl);
-void free_planars(Planar ** pls, size_t k);
-Planar * most_left (Planar ** pls, size_t k);
-
-struct Point: Planar{
-  virtual int x() const;
-  virtual int y() const;
-  virtual int abc_sqr() const;
-  Point(int xx, int yy);
-  virtual ~Point() = default;
-  private:
-  int data[2];
-};
+Planar* make(size_t id);
+void draw(Planar* pl);
+void free_planars(Planar** pls, size_t k);
+Planar* most_left(Planar** pls, size_t k);
 
 int main()
 {
-  Planar * pls[10] = {};
-  size_t k = 0;
-  for(size_t i=0; i < 10; ++i){
-    try
+    Planar* pls[10] = {};
+    size_t k = 0;
+
+    for (size_t i = 0; i < 10; ++i)
     {
-      pls[k]= make(i%2);
-    } catch(...){
-      free_planars(pls, k);
-      return 2;
-    };
-    k++;
-};
-draw(most_left(pls ,k));
-free_planars(pls, k);
-  // pls[k++] = make(std::cin);
-  Planar * left = most_left(pls,k);
-  //draw(left);
-  //free_planars(pls,k); 
+        try
+        {
+            pls[k] = make(i % 2);
+            k++;
+        }
+        catch (...)
+        {
+            free_planars(pls, k);
+            return 2;
+        }
+    }
+
+    Planar* left = most_left(pls, k);
+    if (left)
+    {
+        draw(left);
+    }
+
+    free_planars(pls, k);
+    return 0;
 }
 
-Point::Point(int xx, int yy):
-  Planar(),
-  data{xx, yy}
-  {}
-
-  int Point::x() const {
-    return data[0];
-  }
-  int Point::y() const{
-    return data[1];
-  }
-  int Point::abc_sqr() const {
-    return x() * x() + y() * y();
-  }
-
-Planar * make (size_t id)
+Planar* make(size_t id)
 {
-  Planar * r = nullptr;
-  switch(id)
-  {
+    switch (id)
+    {
     case 0:
-      r = new Point(0, 0);
-
+        return new Point(10, 5);
+    case 1:
+        return new Vector(Point(0, 0), Point(-3, 4));
     default:
-    throw std::logic_error("bad id");
-  }
-
-  return r;
+        throw std::logic_error("bad id");
+    }
 }
 
-Planar * make(size_t pl)
+void free_planars(Planar** pls, size_t k)
 {
-  switch(pl)
-  {
-    default:
-    throw std::logic_error(
-      "bad id");
-  }
-  return nullptr;
+    for (size_t i = 0; i < k; ++i)
+    {
+        delete pls[i];
+        pls[i] = nullptr;
+    }
 }
 
-void free_planars(Planar ** pls, size_t k)
+void draw(Planar* pl)
 {
-  for(size_t i=0; i<k; ++i){
-    delete pls[i];
-  }
+    std::cout << pl->x() << " " << pl->y() << "\n";
 }
 
-void draw(Planar * pl)
+Planar* most_left(Planar** pls, size_t k)
 {
-  std::cout << pl->x() << "\n";
-  std::cout << pl->y() << "\n";
+    if (k == 0) return nullptr;
+
+    Planar* min_obj = pls[0];
+    for (size_t i = 1; i < k; ++i)
+    {
+        if (pls[i]->x() < min_obj->x())
+        {
+            min_obj = pls[i];
+        }
+    }
+    return min_obj;
 }
-
-Planar * most_left (Planar ** pls, size_t k)
-{
-  return nullptr;
-}
-
-
-// Сделать вектор структуру
-// НУЖНО НАПИСАТЬ ДО СРЕДЫ
-// Разбить на ед. тр.
